@@ -17,7 +17,11 @@ ALLOWED_EXTENSIONS = {"pdf", "doc", "docx", "txt", "csv", "xlsx", "png", "jpg", 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-only-change-this-secret")
+
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
+
+if not app.config["SECRET_KEY"]:
+    raise RuntimeError("SECRET_KEY environment variable is required.")
 
 database_path = os.path.join(BASE_DIR, "instance", "trustvault.db")
 
@@ -241,20 +245,32 @@ def register():
         name = request.form.get("name", "").strip()
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
-        role = request.form.get("role", "viewer")
-        if role not in ("owner", "viewer"):
-            role = "viewer"
+
         if not name or not email or len(password) < 10:
-            flash("Enter your name and email. Password must be at least 10 characters.", "error")
+            flash(
+                "Enter your name and email. Password must be at least 10 characters.",
+                "error"
+            )
+
         elif User.query.filter_by(email=email).first():
             flash("That email is already registered.", "error")
+
         else:
-            user = User(name=name, email=email, role=role)
+            # Public registrations always receive viewer role.
+            user = User(
+                name=name,
+                email=email,
+                role="viewer"
+            )
+
             user.set_password(password)
+
             db.session.add(user)
             db.session.commit()
+
             flash("Account created. You can now sign in.", "success")
             return redirect(url_for("login"))
+
     return render_template("register.html")
 
 
