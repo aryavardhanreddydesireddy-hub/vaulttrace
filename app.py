@@ -385,35 +385,83 @@ def add_member(project_id):
     return redirect(url_for("project_detail", project_id=project.id))
 
 
+
 @app.route("/projects/<int:project_id>/upload", methods=["POST"])
 @role_required("owner", "admin")
 def upload_document(project_id):
     project = db.get_or_404(Project, project_id)
+
     if not is_project_owner(project):
         abort(403)
+
     file = request.files.get("file")
+
     if not file or not file.filename:
         flash("Choose a file.", "error")
         return redirect(url_for("project_detail", project_id=project.id))
+
     if not allowed_file(file.filename):
         flash("File type not allowed.", "error")
-        audit("document_upload", "denied", details=f"project_id={project.id};invalid_extension")
+        audit(
+            "document_upload",
+            "denied",
+            details=f"project_id={project.id};invalid_extension"
+        )
         return redirect(url_for("project_detail", project_id=project.id))
+
     data = file.read(MAX_FILE_SIZE + 1)
+
     if len(data) > MAX_FILE_SIZE:
         flash("File is too large (10 MB maximum).", "error")
+        audit(
+            "document_upload",
+            "denied",
+            details=f"project_id={project.id};file_too_large"
+        )
         return redirect(url_for("project_detail", project_id=project.id))
+
     original = secure_filename(file.filename) or "uploaded_file"
     stored = uuid.uuid4().hex
-    with open(os.path.join(app.config["UPLOAD_FOLDER"], stored), "wb") as output:
-        output.write(data)
-    doc = Document(project_id=project.id, owner_id=current_user.id, original_name=original,
-                   stored_name=stored, file_size=len(data))
-    db.session.add(doc)
-    db.session.commit()
-    audit("document_uploaded", document_id=doc.id, details=f"project_id={project.id};name={original}")
-    flash("Document uploaded. No member can access it until you grant permission.", "success")
+    storage_path = os.path.join(app.config["UPLOAD_FOLDER"], stored)
+
+    try:
+        with open(storage_path, "wb") as output:
+            output.write(data)
+
+        doc = Document(
+            project_id=project.id,
+            owner_id=current_user.id,
+            original_name=original,
+            stored_name=stored,
+            file_size=len(data)
+        )
+
+        db.session.add(doc)
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+
+        if os.path.exists(storage_path):
+            os.remove(storage_path)
+
+        app.logger.exception("Document upload failed")
+        flash("Upload could not be completed. Please try again.", "error")
+        return redirect(url_for("project_detail", project_id=project.id))
+
+    audit(
+        "document_uploaded",
+        document_id=doc.id,
+        details=f"project_id={project.id};name={original}"
+    )
+
+    flash(
+        "Document uploaded. No member can access it until you grant permission.",
+        "success"
+    )
+
     return redirect(url_for("project_detail", project_id=project.id))
+
 
 
 @app.route("/documents/<int:document_id>/permissions", methods=["POST"])
