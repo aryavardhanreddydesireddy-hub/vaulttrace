@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block content %}
+<div class="form-card"><div class="eyebrow">GET STARTED</div><h1>Create account</h1>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Full name<input name="name" required maxlength="100"></label>
+<label>Email<input type="email" name="email" required></label>
+<label>Password (minimum 10 characters)<input type="password" name="password" minlength="10" required></label>
+<label>Account type<select name="role"><option value="viewer">Viewer</option><option value="owner">Owner</option></select></label>
+<button class="button primary full">Create account</button></form></div>
+{% endblock %}

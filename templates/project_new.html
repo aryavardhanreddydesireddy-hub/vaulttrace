@@ -1,0 +1,7 @@
+{% extends "base.html" %}{% block content %}
+<div class="form-card"><div class="eyebrow">WORKSPACE SETUP</div><h1>Create a project</h1>
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+<label>Project name<input name="name" required maxlength="140"></label>
+<label>Description<textarea name="description" rows="4"></textarea></label>
+<button class="button primary full">Create project</button></form></div>
+{% endblock %}

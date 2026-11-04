@@ -1,0 +1,13 @@
+TrustVault/
+  app.py                 Flask routes, models, and server-side permission checks
+  run.py                 Application startup
+  requirements.txt       Python dependencies
+  requirements-deploy.txt Deployment dependencies
+  templates/             HTML pages
+  static/style.css       Interface styling
+  tests/                 Automated permission tests
+  README.md              Setup, run, deployment, and limitations
+  THREATS.md             Threat model and security checklist
+  PROMPTS.md             Honest AI-use log template
+  render.yaml            Example deployment configuration
+  .env.example           Environment variable template
