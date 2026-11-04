@@ -3,7 +3,8 @@ import uuid
 import hashlib
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from flask import Flask, render_template, redirect, url_for, flash, request, send_file, abort
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.engine import URL
@@ -17,6 +18,12 @@ ALLOWED_EXTENSIONS = {"pdf", "doc", "docx", "txt", "csv", "xlsx", "png", "jpg", 
 MAX_FILE_SIZE = 10 * 1024 * 1024
 
 app = Flask(__name__)
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=[],
+    storage_uri="memory://"
+)
 
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 
@@ -275,6 +282,7 @@ def register():
 
 
 @app.route("/login", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def login():
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
