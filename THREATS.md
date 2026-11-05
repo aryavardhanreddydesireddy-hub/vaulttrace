@@ -6,20 +6,20 @@ This document identifies security threats in TrustVault, the controls implemente
 
 | Threat | Expected control | Test / evidence | Status |
 |---|---|---|---|
-| Viewer guesses another document ID | Server checks membership and document permission on every download | test_viewer_without_permission_is_denied | Verified |
-| Permission is revoked but old URL is reused | Download route checks current active permission | test_revoked_permission_is_denied | Verified |
-| Permission expires | Expiry is checked server-side | test_expired_permission_is_denied | Automated test passed |
-| User is not a project member | Active project membership is required | test_non_member_is_denied_even_with_permission_record | Verified |
+| Viewer guesses another document ID | Server checks membership and document permission on every download | `test_viewer_without_permission_is_denied` | Verified |
+| Permission is revoked but old URL is reused | Download route checks current active permission | `test_revoked_permission_is_denied` | Verified |
+| Permission expires | Expiry is checked server-side | `test_expired_permission_is_denied` | Automated test passed |
+| User is not a project member | Active project membership is required | `test_non_member_is_denied_even_with_permission_record` | Verified |
 | Unauthorized permission change | Owner/admin authorization checks | Grant, revoke, approve and reject tests | Automated tests passed |
-| Malicious filename | UUID storage and filename sanitization | test_uploaded_filename_is_sanitized | Automated test passed |
-| Unsupported file type | File extension allowlist | test_unsupported_file_extension_is_rejected | Automated test passed |
+| Malicious filename | UUID storage and filename sanitization | `test_uploaded_filename_is_sanitized` | Automated test passed |
+| Unsupported file type | File extension allowlist | `test_unsupported_file_extension_is_rejected` | Automated test passed |
 | File extension does not match content | File signatures and format checks | Fake PDF and PNG rejection tests | Automated tests passed |
-| Oversized upload | Flask request limit and explicit size check | test_oversized_file_upload_is_rejected | Automated test passed |
-| Viewer attempts upload | Server-side role authorization | test_viewer_cannot_upload_document | Automated test passed |
-| CSRF form submission | Flask-WTF CSRF protection | test_post_without_csrf_token_is_rejected | Automated test passed |
-| Password database disclosure | Werkzeug password hashing | test_password_is_stored_as_hash_not_plaintext | Automated test passed |
-| Audit row alteration | SHA-256 previous-hash chain | test_audit_tampering_is_detected | Automated test passed |
-| Brute-force login | Flask-Limiter: 5 requests per minute per IP | Configuration reviewed | Implemented; automated rate-limit test pending |
+| Oversized upload | Flask request limit and explicit size check | `test_oversized_file_upload_is_rejected` | Automated test passed |
+| Viewer attempts upload | Server-side role authorization | `test_viewer_cannot_upload_document` | Automated test passed |
+| CSRF form submission | Flask-WTF CSRF protection | `test_post_without_csrf_token_is_rejected` | Automated test passed |
+| Password database disclosure | Werkzeug password hashing | `test_password_is_stored_as_hash_not_plaintext` | Automated test passed |
+| Audit row alteration | SHA-256 previous-hash chain | `test_audit_tampering_is_detected` | Automated test passed |
+| Brute-force login | Flask-Limiter: 5 requests per minute per IP | `test_login_rate_limit_blocks_sixth_attempt` | Automated test passed |
 | Malicious file content | Basic content validation | PDF and PNG validation tests | Partial protection; malware scanning not implemented |
 | Full database rewrite | Independent immutable audit storage | Not implemented | Known limitation |
 
@@ -51,7 +51,6 @@ This document identifies security threats in TrustVault, the controls implemente
 
 ## Known Limitations and Future Improvements
 
-- Add automated login rate-limiting tests.
 - Add malware scanning.
 - Perform additional expiry and membership-removal checks.
 - Store audit exports in independently controlled immutable storage.
@@ -60,9 +59,9 @@ This document identifies security threats in TrustVault, the controls implemente
 
 ## Testing Summary
 
-The automated test suite contains 22 tests, and all 22 passed in the latest test run.
+The automated test suite contains **23 tests, and all 23 passed** in the latest test run.
 
-Tests cover permission enforcement, membership, unauthorized actions, password hashing, audit tampering, upload restrictions, filename sanitization, CSRF protection, public registration roles, and file-content validation.
+Tests cover permission enforcement, membership, unauthorized actions, password hashing, audit tampering, upload restrictions, filename sanitization, CSRF protection, public registration roles, file-content validation, and login rate limiting.
 
 Manual verification has also confirmed permission revocation using the same document URL and audit-chain verification.
 
