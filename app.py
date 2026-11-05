@@ -1,6 +1,8 @@
 import os
 import uuid
 import hashlib
+import io
+import zipfile
 from datetime import datetime, timedelta, timezone
 from functools import wraps
 from flask_limiter import Limiter
@@ -232,6 +234,67 @@ def can_edit(document, user):
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+def validate_file_content(filename, data):
+    """
+    Validate uploaded file content against its extension.
+    Returns True if the content appears to match the expected type.
+    """
+
+    extension = filename.rsplit(".", 1)[1].lower()
+
+    # PDF signature
+    if extension == "pdf":
+        return data.startswith(b"%PDF-")
+
+    # PNG signature
+    if extension == "png":
+        return data.startswith(b"\x89PNG\r\n\x1a\n")
+
+    # JPEG signature
+    if extension in ("jpg", "jpeg"):
+        return data.startswith(b"\xff\xd8\xff")
+
+    # Older Microsoft Word DOC signature
+    if extension == "doc":
+        return data.startswith(
+            b"\xd0\xcf\x11\xe0\xa1\xb1\x1a\xe1"
+        )
+
+    # DOCX and XLSX are ZIP-based formats
+    if extension in ("docx", "xlsx"):
+        try:
+            with zipfile.ZipFile(io.BytesIO(data)) as archive:
+                names = set(archive.namelist())
+
+                if extension == "docx":
+                    return (
+                        "[Content_Types].xml" in names
+                        and "word/document.xml" in names
+                    )
+
+                if extension == "xlsx":
+                    return (
+                        "[Content_Types].xml" in names
+                        and "xl/workbook.xml" in names
+                    )
+
+        except (zipfile.BadZipFile, OSError):
+            return False
+
+        return False
+
+    # TXT and CSV: check that the content is valid UTF-8 text.
+    if extension in ("txt", "csv"):
+        if b"\x00" in data:
+            return False
+
+        try:
+            data.decode("utf-8-sig")
+            return True
+        except UnicodeDecodeError:
+            return False
+
+    return False
 
 
 @app.context_processor
@@ -386,30 +449,6 @@ def project_detail(project_id):
 
 
 
-@app.route("/projects/<int:project_id>/members", methods=["POST"])
-@role_required("owner", "admin")
-def add_member(project_id):
-    project = db.get_or_404(Project, project_id)
-    if not is_project_owner(project):
-        abort(403)
-    user = User.query.filter_by(email=request.form.get("email", "").strip().lower(), active=True).first()
-    if not user or user.role == "admin":
-        flash("No eligible user found with that email.", "error")
-    elif active_membership(project.id, user.id):
-        flash("That user is already an active member.", "error")
-    else:
-        membership = Membership.query.filter_by(project_id=project.id, user_id=user.id).first()
-        if membership:
-            membership.active = True
-        else:
-            db.session.add(Membership(project_id=project.id, user_id=user.id))
-        db.session.commit()
-        audit("member_added", details=f"project_id={project.id};user_id={user.id}")
-        flash("Member added. Document permissions must still be granted separately.", "success")
-    return redirect(url_for("project_detail", project_id=project.id))
-
-
-
 @app.route("/projects/<int:project_id>/upload", methods=["POST"])
 @role_required("owner", "admin")
 def upload_document(project_id):
@@ -445,6 +484,20 @@ def upload_document(project_id):
         return redirect(url_for("project_detail", project_id=project.id))
 
     original = secure_filename(file.filename) or "uploaded_file"
+
+    # Validate the actual file content.
+    if not validate_file_content(original, data):
+        flash(
+            "File content does not match the selected file type.",
+            "error"
+        )
+        audit(
+            "document_upload",
+            "denied",
+            details=f"project_id={project.id};content_validation_failed"
+        )
+        return redirect(url_for("project_detail", project_id=project.id))
+
     stored = uuid.uuid4().hex
     storage_path = os.path.join(app.config["UPLOAD_FOLDER"], stored)
 
@@ -470,7 +523,10 @@ def upload_document(project_id):
             os.remove(storage_path)
 
         app.logger.exception("Document upload failed")
-        flash("Upload could not be completed. Please try again.", "error")
+        flash(
+            "Upload could not be completed. Please try again.",
+            "error"
+        )
         return redirect(url_for("project_detail", project_id=project.id))
 
     audit(

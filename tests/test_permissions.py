@@ -384,3 +384,60 @@ def test_viewer_cannot_upload_document(client, app):
     with flask_app.app_context():
         after_count = Document.query.count()
         assert after_count == before_count
+
+def test_fake_pdf_file_is_rejected(client, app):
+    from io import BytesIO
+    from app import Document
+
+    flask_app, data = app
+
+    client.post("/login", data={
+        "email": "owner@test.local",
+        "password": "owner-password-123"
+    })
+
+    with flask_app.app_context():
+        before_count = Document.query.count()
+
+    response = client.post(
+        f"/projects/{data['project_id']}/upload",
+        data={
+            "file": (BytesIO(b"This is not a PDF"), "fake.pdf")
+        },
+        content_type="multipart/form-data"
+    )
+
+    assert response.status_code == 302
+
+    with flask_app.app_context():
+        after_count = Document.query.count()
+        assert after_count == before_count
+
+
+def test_invalid_png_file_is_rejected(client, app):
+    from io import BytesIO
+    from app import Document
+
+    flask_app, data = app
+
+    client.post("/login", data={
+        "email": "owner@test.local",
+        "password": "owner-password-123"
+    })
+
+    with flask_app.app_context():
+        before_count = Document.query.count()
+
+    response = client.post(
+        f"/projects/{data['project_id']}/upload",
+        data={
+            "file": (BytesIO(b"Not a real PNG image"), "fake.png")
+        },
+        content_type="multipart/form-data"
+    )
+
+    assert response.status_code == 302
+
+    with flask_app.app_context():
+        after_count = Document.query.count()
+        assert after_count == before_count
