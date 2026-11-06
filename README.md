@@ -46,13 +46,24 @@ py -m venv .venv
 python -m pip install -r requirements.txt
 ```
 
-### 4. Start the application
+### 4. Configure environment variables
+
+The application requires a secret key and an initial admin password.
+
+```powershell
+$env:SECRET_KEY = "your-generated-secret-key"
+$env:ADMIN_PASSWORD = "your-unique-admin-password"
+```
+
+Use your own strong values in your terminal. Do not put real secret values in this README or commit them to GitHub.
+
+### 5. Start the application
 
 ```powershell
 python run.py
 ```
 
-### 5. Open the application
+### 6. Open the application
 
 Visit:
 
@@ -65,9 +76,9 @@ If `py` is unavailable, use `python` instead.
 The database is created automatically on first start.
 
 - Email: `admin@trustvault.local`
-- Password: `REMOVED_OLD_DEMO_PASSWORD!`
+- Password: The value you configured using the `ADMIN_PASSWORD` environment variable.
 
-These are demo credentials. Change the password before any public deployment by setting the `ADMIN_PASSWORD` environment variable. Never use the sample credentials on a public website.
+The initial admin account is created only when it does not already exist in the database. Keep the admin password private and never publish it.
 
 For initial testing:
 
@@ -118,27 +129,44 @@ Keep the repository private while the challenge rules require it. Make it public
 
 ## Deployment Notes
 
-This app stores uploaded files on the local filesystem and uses SQLite by default. Many free hosting services use temporary filesystems, so uploaded files and SQLite data may disappear after a redeployment or restart.
+The repository includes a Render deployment configuration using a persistent disk.
 
-For a reliable public deployment, configure:
+The current deployment configuration uses:
 
-1. A managed PostgreSQL database using `DATABASE_URL`.
-2. Persistent object storage for uploaded documents, or a persistent disk attached to the web service.
-3. A strong `SECRET_KEY` and unique `ADMIN_PASSWORD`.
-4. HTTPS and the hosting provider's secure cookie settings.
+- Database: SQLite
+- Database location: `/var/data/trustvault.db`
+- Upload directory: `/var/data/vault`
+- `DATABASE_URL`: Configures the database location.
+- `UPLOAD_FOLDER`: Configures the uploaded-file location.
+- `SECRET_KEY`: Must be generated securely through Render environment variables.
+- `ADMIN_PASSWORD`: Must be configured manually through Render environment variables.
 
-Do not deploy with the sample admin password or debug mode enabled.
+Set the following values in the Render service environment variables:
+
+```text
+DATABASE_URL=sqlite:////var/data/trustvault.db
+UPLOAD_FOLDER=/var/data/vault
+```
+
+Configure `SECRET_KEY` and `ADMIN_PASSWORD` separately in the Render dashboard. Never publish their actual values.
+
+The persistent disk is configured to store the database and uploaded files across service restarts and deployments. Confirm the disk is available and mounted correctly before relying on the deployed application.
+
+PostgreSQL and cloud-based object storage are possible future improvements; they are not part of the current configuration.
 
 The repository includes a basic `render.yaml` as a starting point, not a one-click deployment guarantee. Verify the live URL in a private or incognito browser window.
+
+Do not deploy with debug mode enabled or a publicly known admin password.
 
 ## Current Limitations
 
 - The admin role is trusted by the application and can access all documents. A real organization may require stricter separation of duties.
 - The hash chain detects some changes to stored audit rows, but it is not tamper-proof if an attacker can rewrite the entire database and recompute hashes. Stronger evidence requires independently controlled immutable storage and verification of all relevant event fields.
-- File type validation is based on extension, not deep content inspection or malware scanning.
+- File type validation is based on extension and basic content checks, not deep content inspection or malware scanning.
 - `edit` permission is stored and enforced as an access level, but in-app document editing is not implemented.
-- Password reset, MFA, email notifications, virus scanning, rate limiting, and object-storage integration are not included.
-- SQLite is intended for local development. Configure durable database and file storage before relying on a deployed instance.
+- Password reset, MFA, email notifications, virus scanning, and object-storage integration are not included.
+- The current rate-limiting configuration uses in-memory storage and is not shared across multiple application instances. A shared storage backend such as Redis would be preferable for a larger deployment.
+- SQLite is intended for this learning project. Consider a managed database and durable file storage before using the application for real organizational data.
 
 ## Project Documentation
 

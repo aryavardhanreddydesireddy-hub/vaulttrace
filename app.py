@@ -815,9 +815,22 @@ def too_large(_error):
 def initialize_database():
     with app.app_context():
         db.create_all()
+
         if not User.query.filter_by(email="admin@trustvault.local").first():
-            admin = User(name="TrustVault Admin", email="admin@trustvault.local", role="admin")
-            admin.set_password(os.environ.get("ADMIN_PASSWORD", "REMOVED_OLD_DEMO_PASSWORD!"))
+            admin = User(
+                name="TrustVault Admin",
+                email="admin@trustvault.local",
+                role="admin"
+            )
+
+            admin_password = os.environ.get("ADMIN_PASSWORD")
+
+            if not admin_password:
+                raise RuntimeError(
+                    "ADMIN_PASSWORD environment variable is required."
+                )
+
+            admin.set_password(admin_password)
             db.session.add(admin)
             db.session.commit()
 

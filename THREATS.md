@@ -19,9 +19,9 @@ This document identifies security threats in TrustVault, the controls implemente
 | CSRF form submission | Flask-WTF CSRF protection | `test_post_without_csrf_token_is_rejected` | Automated test passed |
 | Password database disclosure | Werkzeug password hashing | `test_password_is_stored_as_hash_not_plaintext` | Automated test passed |
 | Audit row alteration | SHA-256 previous-hash chain | `test_audit_tampering_is_detected` | Automated test passed |
-| Brute-force login | Flask-Limiter: 5 requests per minute per IP | `test_login_rate_limit_blocks_sixth_attempt` | Automated test passed |
+| Brute-force login | Flask-Limiter: 5 requests per minute per IP | `test_login_rate_limit_blocks_sixth_attempt` | Automated test passed; in-memory storage limitation |
 | Malicious file content | Basic content validation | PDF and PNG validation tests | Partial protection; malware scanning not implemented |
-| Full database rewrite | Independent immutable audit storage | Not implemented | Known limitation |
+| Full database rewrite | Independently controlled immutable audit storage | Not implemented | Known limitation |
 
 ## Security Invariants
 
@@ -56,13 +56,14 @@ This document identifies security threats in TrustVault, the controls implemente
 - Store audit exports in independently controlled immutable storage.
 - Use shared rate-limit storage such as Redis for production deployments.
 - Test file-content validation against additional formats and edge cases.
+- Consider additional secure session-cookie settings for HTTPS deployment.
 
 ## Testing Summary
 
-The automated test suite contains **23 tests, and all 23 passed** in the latest test run.
+The previously reported automated test run contained **23 tests, and all 23 passed**.
 
 Tests cover permission enforcement, membership, unauthorized actions, password hashing, audit tampering, upload restrictions, filename sanitization, CSRF protection, public registration roles, file-content validation, and login rate limiting.
 
 Manual verification has also confirmed permission revocation using the same document URL and audit-chain verification.
 
-Further security testing is required before describing TrustVault as production-ready.
+The test suite should be run again after the latest code changes and before submission. Further security testing is required before describing TrustVault as production-ready.
