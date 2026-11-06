@@ -1,7 +1,9 @@
+
 services:
   - type: web
     name: trustvault
     runtime: python
+    plan: free
     buildCommand: pip install -r requirements-deploy.txt
     startCommand: gunicorn run:app
     envVars:
@@ -12,10 +14,6 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: DATABASE_URL
-        sync: false
+        value: sqlite:////tmp/trustvault.db
       - key: UPLOAD_FOLDER
-        value: /var/data/vault
-    disk:
-      name: trustvault-files
-      mountPath: /var/data
-      sizeGB: 1
+        value: /tmp/trustvault-uploads
