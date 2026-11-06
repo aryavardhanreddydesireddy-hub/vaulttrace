@@ -6,6 +6,12 @@ A learning-focused Flask application demonstrating project membership, per-docum
 
 This is a starter implementation, not a security certification or a guarantee of production readiness. Run the application, test it, inspect the authorization code, change the demo credentials, and document any remaining limitations honestly. Do not claim a feature works until you have verified it.
 
+## Live Application
+
+**Live URL:** https://trustvault-ctwg.onrender.com/
+
+The application is deployed using the Render Free Web Service plan for demonstration and project evaluation.
+
 ## Features Included
 
 - Three account roles: `admin`, `owner`, and `viewer`.
@@ -82,13 +88,15 @@ The initial admin account is created only when it does not already exist in the 
 
 For initial testing:
 
-1. Register two test users: one Owner and one Viewer.
-2. Sign in as Owner.
-3. Create a project.
-4. Add the Viewer by email.
-5. Upload a document.
+1. Sign in using the administrator account.
+2. Create a project.
+3. Register a test Viewer account.
+4. Add the Viewer to the project using their registered email address.
+5. Upload a sample document.
 6. Grant the Viewer read permission.
-7. Sign out and test the Viewer account.
+7. Sign in using the Viewer account and test document access.
+
+Public registration creates Viewer accounts. Administrator and project-owner privileges must not be granted through public registration.
 
 ## Permission Model
 
@@ -109,7 +117,11 @@ Activate the virtual environment and run:
 pytest -q
 ```
 
-The permission tests use a temporary SQLite database and temporary upload directory. Add tests for every new feature you implement.
+The permission tests use a temporary SQLite database and temporary upload directory.
+
+The previously completed test run reported 23 passing tests. Run the test suite again after making code changes to confirm the current result.
+
+Add tests for every new feature you implement.
 
 ## Git Workflow
 
@@ -129,34 +141,47 @@ Keep the repository private while the challenge rules require it. Make it public
 
 ## Deployment Notes
 
-The repository includes a Render deployment configuration using a persistent disk.
+### Current Deployment Configuration
 
-The current deployment configuration uses:
+TrustVault is deployed on Render using its Free Web Service plan.
 
+- Hosting: Render Free Web Service
+- Application server: Gunicorn
 - Database: SQLite
-- Database location: `/var/data/trustvault.db`
-- Upload directory: `/var/data/vault`
-- `DATABASE_URL`: Configures the database location.
-- `UPLOAD_FOLDER`: Configures the uploaded-file location.
-- `SECRET_KEY`: Must be generated securely through Render environment variables.
-- `ADMIN_PASSWORD`: Must be configured manually through Render environment variables.
+- Database location: `/tmp/trustvault.db`
+- Upload directory: `/tmp/trustvault-uploads`
 
-Set the following values in the Render service environment variables:
+### Environment Variables
 
-```text
-DATABASE_URL=sqlite:////var/data/trustvault.db
-UPLOAD_FOLDER=/var/data/vault
-```
+The following environment variables are configured through the Render dashboard:
 
-Configure `SECRET_KEY` and `ADMIN_PASSWORD` separately in the Render dashboard. Never publish their actual values.
+- `SECRET_KEY`: Securely generated application secret.
+- `ADMIN_PASSWORD`: Initial administrator password.
+- `DATABASE_URL`: SQLite database location.
+- `UPLOAD_FOLDER`: Temporary document upload location.
 
-The persistent disk is configured to store the database and uploaded files across service restarts and deployments. Confirm the disk is available and mounted correctly before relying on the deployed application.
+Never publish actual secret values or administrator credentials.
 
-PostgreSQL and cloud-based object storage are possible future improvements; they are not part of the current configuration.
+### Important Free-Plan Storage Limitation
 
-The repository includes a basic `render.yaml` as a starting point, not a one-click deployment guarantee. Verify the live URL in a private or incognito browser window.
+The current free deployment uses temporary local storage.
 
-Do not deploy with debug mode enabled or a publicly known admin password.
+Database records, user accounts, project information, permissions, audit events, and uploaded documents may be lost when the Render service restarts, sleeps, or redeploys.
+
+Therefore:
+
+- Use demonstration accounts and sample documents only.
+- Do not upload confidential or personally sensitive documents.
+- Do not rely on the live deployment for permanent data storage.
+- Re-test the application after a restart or redeployment.
+
+The current deployment is intended for educational demonstrations and project evaluation, not production use.
+
+### Future Deployment Improvements
+
+Persistent PostgreSQL database storage and cloud-based object storage can be integrated in a future version to improve data durability.
+
+The current deployment does not include a persistent disk or external object-storage integration.
 
 ## Current Limitations
 
@@ -167,6 +192,7 @@ Do not deploy with debug mode enabled or a publicly known admin password.
 - Password reset, MFA, email notifications, virus scanning, and object-storage integration are not included.
 - The current rate-limiting configuration uses in-memory storage and is not shared across multiple application instances. A shared storage backend such as Redis would be preferable for a larger deployment.
 - SQLite is intended for this learning project. Consider a managed database and durable file storage before using the application for real organizational data.
+- The current Render Free deployment uses temporary local storage. Database records and uploaded documents are not guaranteed to survive service restarts, sleep, or redeployment.
 
 ## Project Documentation
 
