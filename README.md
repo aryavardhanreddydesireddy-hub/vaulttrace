@@ -8,7 +8,7 @@ This is an educational project demonstration, not a security certification or a 
 
 ## Live Application
 
-**Live URL:** https://trustvault-ctwg.onrender.com/
+**Live URL:** https://vaulttrace-q9bb.onrender.com/
 
 The application is deployed using the Render Free Web Service plan for demonstration and project evaluation.
 
