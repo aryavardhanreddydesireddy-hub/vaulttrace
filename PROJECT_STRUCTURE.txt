@@ -1,8 +1,8 @@
+VaultTrace Project Structure
 
-VaultTrace project structure
-(Local folder name: TrustVault)
+(Local folder name: VaultTrace)
 
-TrustVault/
+VaultTrace/
   app.py                    Flask routes, models, and server-side permission checks
   run.py                    Application startup
   requirements.txt          Python dependencies
