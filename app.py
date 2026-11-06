@@ -447,7 +447,49 @@ def project_detail(project_id):
         if is_project_owner(project) else []
     )
 
+@app.route("/projects/<int:project_id>/members", methods=["POST"])
+@role_required("owner", "admin")
+def add_member(project_id):
+    project = db.get_or_404(Project, project_id)
 
+    if not is_project_owner(project):
+        abort(403)
+
+    email = request.form.get("email", "").strip().lower()
+    user = User.query.filter_by(email=email, active=True).first()
+
+    if not user:
+        flash("No active user found with that email.", "error")
+        return redirect(url_for("project_detail", project_id=project.id))
+
+    if user.id == project.owner_id:
+        flash("The project owner is already a member.", "error")
+        return redirect(url_for("project_detail", project_id=project.id))
+
+    membership = Membership.query.filter_by(
+        project_id=project.id,
+        user_id=user.id
+    ).first()
+
+    if membership:
+        if membership.active:
+            flash("This user is already a project member.", "error")
+        else:
+            membership.active = True
+            db.session.commit()
+            audit("member_added", details=f"project_id={project.id};user_id={user.id}")
+            flash("Project membership reactivated.", "success")
+    else:
+        db.session.add(Membership(
+            project_id=project.id,
+            user_id=user.id,
+            active=True
+        ))
+        db.session.commit()
+        audit("member_added", details=f"project_id={project.id};user_id={user.id}")
+        flash("Member added successfully.", "success")
+
+    return redirect(url_for("project_detail", project_id=project.id))
 
 @app.route("/projects/<int:project_id>/upload", methods=["POST"])
 @role_required("owner", "admin")
