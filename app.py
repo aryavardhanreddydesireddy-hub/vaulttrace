@@ -32,7 +32,7 @@ app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 if not app.config["SECRET_KEY"]:
     raise RuntimeError("SECRET_KEY environment variable is required.")
 
-database_path = os.path.join(BASE_DIR, "instance", "trustvault.db")
+database_path = os.path.join(BASE_DIR, "instance", "vaulttrace.db")
 
 os.makedirs(os.path.dirname(database_path), exist_ok=True)
 
@@ -234,6 +234,8 @@ def can_edit(document, user):
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 def validate_file_content(filename, data):
     """
     Validate uploaded file content against its extension.
@@ -447,6 +449,7 @@ def project_detail(project_id):
         if is_project_owner(project) else []
     )
 
+
 @app.route("/projects/<int:project_id>/members", methods=["POST"])
 @role_required("owner", "admin")
 def add_member(project_id):
@@ -490,6 +493,7 @@ def add_member(project_id):
         flash("Member added successfully.", "success")
 
     return redirect(url_for("project_detail", project_id=project.id))
+
 
 @app.route("/projects/<int:project_id>/upload", methods=["POST"])
 @role_required("owner", "admin")
@@ -585,7 +589,6 @@ def upload_document(project_id):
     return redirect(url_for("project_detail", project_id=project.id))
 
 
-
 @app.route("/documents/<int:document_id>/permissions", methods=["POST"])
 @role_required("owner", "admin")
 def grant_permission(document_id):
@@ -613,7 +616,6 @@ def grant_permission(document_id):
     audit("permission_granted", document_id=doc.id, details=f"user_id={user_id};level={level};days={days}")
     flash("Document permission saved.", "success")
     return redirect(url_for("project_detail", project_id=doc.project_id))
-
 
 
 @app.route("/documents/<int:document_id>/revoke/<int:user_id>", methods=["POST"])
@@ -652,7 +654,6 @@ def revoke_permission(document_id, user_id):
         flash("Permission revoked successfully.", "success")
 
     return redirect(url_for("project_detail", project_id=doc.project_id))
-
 
 
 @app.route("/documents/<int:document_id>/download")
@@ -816,10 +817,10 @@ def initialize_database():
     with app.app_context():
         db.create_all()
 
-        if not User.query.filter_by(email="admin@trustvault.local").first():
+        if not User.query.filter_by(email="admin@vaulttrace.local").first():
             admin = User(
                 name="VaultTrace Admin",
-                email="admin@trustvault.local",
+                email="admin@vaulttrace.local",
                 role="admin"
             )
 

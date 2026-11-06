@@ -1,4 +1,3 @@
-
 # VaultTrace – Intelligent Document Access Control
 
 A Flask-based document-sharing application demonstrating project membership, per-document permissions, access requests, protected downloads, and a hash-linked audit log.
@@ -82,7 +81,7 @@ If `py` is unavailable, use `python` instead.
 
 The database is created automatically on first start.
 
-- Email: `admin@trustvault.local`
+- Email: `admin@vaulttrace.local`
 - Password: The value configured using the `ADMIN_PASSWORD` environment variable.
 
 The initial admin account is created only when it does not already exist in the database. Keep the admin password private and never publish it.
@@ -149,8 +148,8 @@ VaultTrace is deployed on Render using its Free Web Service plan.
 - Hosting: Render Free Web Service
 - Application server: Gunicorn
 - Database: SQLite
-- Database location: `/tmp/trustvault.db`
-- Upload directory: `/tmp/trustvault-uploads`
+- Database location: `/tmp/vaulttrace.db`
+- Upload directory: `/tmp/vaulttrace-uploads`
 
 ### Environment Variables
 

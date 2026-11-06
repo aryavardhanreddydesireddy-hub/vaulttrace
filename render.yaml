@@ -1,7 +1,6 @@
-
 services:
   - type: web
-    name: trustvault
+    name: vaulttrace
     runtime: python
     plan: free
     buildCommand: pip install -r requirements-deploy.txt
@@ -14,6 +13,6 @@ services:
       - key: ADMIN_PASSWORD
         sync: false
       - key: DATABASE_URL
-        value: sqlite:////tmp/trustvault.db
+        value: sqlite:////tmp/vaulttrace.db
       - key: UPLOAD_FOLDER
-        value: /tmp/trustvault-uploads
+        value: /tmp/vaulttrace-uploads
