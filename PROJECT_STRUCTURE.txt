@@ -1,3 +1,7 @@
+
+VaultTrace project structure
+(Local folder name: TrustVault)
+
 TrustVault/
   app.py                    Flask routes, models, and server-side permission checks
   run.py                    Application startup
@@ -7,8 +11,8 @@ TrustVault/
   static/style.css          Interface styling
   tests/                    Automated security and permission tests
   README.md                 Setup, run, deployment, and limitations
-  THREATS.md                Threat model and security checklist
-  PROMPTS.md                AI-assisted development log
+  THREATS.md                VaultTrace threat model and security checklist
+  PROMPTS.md                VaultTrace AI-assisted development log
   render.yaml               Render deployment configuration
   .gitignore                Files excluded from Git
   .env.example              Environment variable template

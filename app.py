@@ -818,7 +818,7 @@ def initialize_database():
 
         if not User.query.filter_by(email="admin@trustvault.local").first():
             admin = User(
-                name="TrustVault Admin",
+                name="VaultTrace Admin",
                 email="admin@trustvault.local",
                 role="admin"
             )

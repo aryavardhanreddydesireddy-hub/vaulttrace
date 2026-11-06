@@ -1,11 +1,12 @@
+
 # AI-Assisted Development Log
 
-This log records AI-assisted development activities, the checks performed, and the corrections made during TrustVault development. AI-generated suggestions were reviewed and tested before being accepted.
+This log records AI-assisted development activities, the checks performed, and the corrections made during VaultTrace development. AI-generated suggestions were reviewed and tested before being accepted.
 
 ## Entry 1 — 2026-11-04 — Document Access Authorization Review
 
 - **Tool:** ChatGPT
-- **What I asked:** Review the TrustVault authorization logic and help verify whether users without document permissions can access documents.
+- **What I asked:** Review the VaultTrace authorization logic and help verify whether users without document permissions can access documents.
 - **What it produced:** Suggested reviewing permission checks for document ownership, active project membership, permission status, and expiry.
 - **What was wrong or incomplete:** Code review alone could not prove that every unauthorized access attempt was blocked.
 - **What I changed:** Added and ran tests for viewers without permission, revoked permissions, expired permissions, non-members, and inactive owners.
@@ -15,7 +16,7 @@ This log records AI-assisted development activities, the checks performed, and t
 ## Entry 2 — 2026-11-04 — Audit Trail Integrity Testing
 
 - **Tool:** ChatGPT
-- **What I asked:** Help test whether TrustVault's SHA-256 audit hash chain detects changes to existing audit events.
+- **What I asked:** Help test whether VaultTrace's SHA-256 audit hash chain detects changes to existing audit events.
 - **What it produced:** Suggested creating an audit event, modifying its stored details, and checking the audit verification result.
 - **What was wrong or incomplete:** The initial test assertion did not match the actual verification message displayed by the application.
 - **What I changed:** Checked the application's actual verification output and corrected the test assertion.

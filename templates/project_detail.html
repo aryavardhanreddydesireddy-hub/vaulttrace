@@ -2,7 +2,7 @@
 <div class="page-heading"><div><div class="eyebrow">PROJECT #{{ project.id }}</div><h1>{{ project.name }}</h1><p class="muted">{{ project.description }}</p></div><a class="button" href="{{ url_for('dashboard') }}">← Dashboard</a></div>
 {% if current_user.role in ('owner','admin') and (current_user.role == 'admin' or project.owner_id == current_user.id) %}
 <div class="grid two">
-<section class="card"><h2>Add project member</h2><p class="muted">The person must already have a TrustVault account.</p>
+<section class="card"><h2>Add project member</h2><p class="muted">The person must already have a VaultTrace account.</p>
 <form method="post" action="{{ url_for('add_member', project_id=project.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Member email<input type="email" name="email" required></label><button class="button primary">Add member</button></form></section>
 <section class="card"><h2>Upload document</h2><p class="muted">Allowed: PDF, Office docs, text, CSV and common images. Maximum 10 MB.</p>
 <form method="post" enctype="multipart/form-data" action="{{ url_for('upload_document', project_id=project.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><label>Choose file<input type="file" name="file" required></label><button class="button primary">Upload</button></form></section>

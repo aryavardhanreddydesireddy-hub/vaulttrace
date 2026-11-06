@@ -1,10 +1,11 @@
-# TrustVault — Secure Document Sharing
 
-A learning-focused Flask application demonstrating project membership, per-document permissions, access requests, protected downloads, and an append-only hash-linked audit log.
+# VaultTrace – Intelligent Document Access Control
+
+A Flask-based document-sharing application demonstrating project membership, per-document permissions, access requests, protected downloads, and a hash-linked audit log.
 
 ## Important Before Submission
 
-This is a starter implementation, not a security certification or a guarantee of production readiness. Run the application, test it, inspect the authorization code, change the demo credentials, and document any remaining limitations honestly. Do not claim a feature works until you have verified it.
+This is an educational project demonstration, not a security certification or a guarantee of production readiness. Run the application, test it, inspect the authorization code, change demo credentials, and document remaining limitations honestly.
 
 ## Live Application
 
@@ -82,7 +83,7 @@ If `py` is unavailable, use `python` instead.
 The database is created automatically on first start.
 
 - Email: `admin@trustvault.local`
-- Password: The value you configured using the `ADMIN_PASSWORD` environment variable.
+- Password: The value configured using the `ADMIN_PASSWORD` environment variable.
 
 The initial admin account is created only when it does not already exist in the database. Keep the admin password private and never publish it.
 
@@ -106,7 +107,7 @@ Public registration creates Viewer accounts. Administrator and project-owner pri
 - `read` permits download.
 - `edit` also permits download and is intended for future document-edit operations.
 - Revocation sets the permission inactive. The download route checks the database on every request.
-- A suspended or removed membership blocks the viewer even if a permission record remains active.
+- An inactive membership blocks the viewer even if a permission record remains active.
 
 ## Tests
 
@@ -119,7 +120,7 @@ pytest -q
 
 The permission tests use a temporary SQLite database and temporary upload directory.
 
-The previously completed test run reported 23 passing tests. Run the test suite again after making code changes to confirm the current result.
+A previous test run reported 23 passing tests. Run the test suite again after making code changes to confirm the current result.
 
 Add tests for every new feature you implement.
 
@@ -143,7 +144,7 @@ Keep the repository private while the challenge rules require it. Make it public
 
 ### Current Deployment Configuration
 
-TrustVault is deployed on Render using its Free Web Service plan.
+VaultTrace is deployed on Render using its Free Web Service plan.
 
 - Hosting: Render Free Web Service
 - Application server: Gunicorn

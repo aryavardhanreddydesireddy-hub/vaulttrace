@@ -1,14 +1,33 @@
-{% extends "base.html" %}{% block title %}TrustVault — Secure sharing{% endblock %}
+
+{% extends "base.html" %}
+{% block title %}VaultTrace — Secure sharing{% endblock %}
+
 {% block content %}
 <section class="hero">
   <div class="eyebrow">SECURE DOCUMENT WORKSPACE</div>
   <h1>Share documents.<br><span>Keep control.</span></h1>
   <p>Manage projects, grant document-level access, and keep an auditable record of important actions.</p>
-  <div class="actions"><a class="button primary" href="{{ url_for('login') }}">Sign in</a><a class="button" href="{{ url_for('register') }}">Create an account</a></div>
+  <div class="actions">
+    <a class="button primary" href="{{ url_for('login') }}">Sign in</a>
+    <a class="button" href="{{ url_for('register') }}">Create an account</a>
+  </div>
 </section>
+
 <div class="grid three">
-  <article class="card"><div class="symbol">01</div><h3>Separate roles</h3><p>Admin, owner and viewer experiences with server-side checks.</p></article>
-  <article class="card"><div class="symbol">02</div><h3>Fine-grained access</h3><p>Grant read or edit access to each document individually.</p></article>
-  <article class="card"><div class="symbol">03</div><h3>Audit trail</h3><p>Record successful and denied document access attempts.</p></article>
+  <article class="card">
+    <div class="symbol">01</div>
+    <h3>Separate roles</h3>
+    <p>Admin, owner and viewer experiences with server-side checks.</p>
+  </article>
+  <article class="card">
+    <div class="symbol">02</div>
+    <h3>Fine-grained access</h3>
+    <p>Grant read or edit access to each document individually.</p>
+  </article>
+  <article class="card">
+    <div class="symbol">03</div>
+    <h3>Audit trail</h3>
+    <p>Record successful and denied document access attempts.</p>
+  </article>
 </div>
 {% endblock %}

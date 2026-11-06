@@ -1,6 +1,7 @@
-# TrustVault Threat Model
 
-This document identifies security threats in TrustVault, the controls implemented to reduce them, and the tests or evidence used to evaluate those controls.
+# VaultTrace Threat Model
+
+This document identifies security threats in VaultTrace, the controls implemented to reduce them, and the tests or evidence used to evaluate those controls.
 
 ## Threat Analysis
 
@@ -66,4 +67,4 @@ Tests cover permission enforcement, membership, unauthorized actions, password h
 
 Manual verification has also confirmed permission revocation using the same document URL and audit-chain verification.
 
-The test suite should be run again after the latest code changes and before submission. Further security testing is required before describing TrustVault as production-ready.
+The test suite should be run again after the latest code changes and before submission. Further security testing is required before describing VaultTrace as production-ready.
